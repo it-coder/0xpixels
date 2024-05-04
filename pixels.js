@@ -12338,6 +12338,7 @@
                 if (await H.Z.scanGameLibrary(this.room.state.entities),
                 this.selfPlayer) {
                     let m = JSON.parse(JSON.stringify(this.currentPlayer));
+                    window.pixelsListener("CURRENT_PLAYER", m); 
                     (null === (J = m.full.pet) || void 0 === J ? void 0 : J.avatar) || delete m.full.pet,
                     this.initPlayers(),
                     this.setupSelfPlayerListeners(this.selfPlayer, er),
