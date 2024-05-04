@@ -12462,6 +12462,7 @@
             inventoryChanged() {
                 if (this.selfPlayer) {
                     let m = JSON.parse(JSON.stringify(this.selfPlayer.inventory));
+                    window.pixelsListener("PLAYER_INVENTORY_CHANGE", m);
                     B.ZP.sendEvent("PLAYER_INVENTORY_CHANGE", {
                         inventory: m
                     })
