@@ -4221,6 +4221,7 @@
                 return this.onMessageHandlers.on(this.getMessageHandlerKey(m), R)
             }
             send(m, R) {
+                console.log('socket sender : ', m, R)
                 let C;
                 let T = [V.Protocol.ROOM_DATA];
                 if ("string" == typeof m ? W.encode.string(T, m) : W.encode.number(T, m),
@@ -12775,7 +12776,8 @@
                 this.updatedEntities = new Set,
                 this.updatedPet = !1,
                 this.updatedInventory = !1,
-                this.checkParams()
+                this.checkParams(),
+                window.gamestate = this
             }
         }
         ;
