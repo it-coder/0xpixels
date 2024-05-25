@@ -4306,6 +4306,9 @@
                     }
                       , T = W.decode.stringCheck(R, C) ? W.decode.string(R, C) : W.decode.number(R, C)
                       , L = R.length > C.offset ? B.decode(m.data, C.offset) : void 0;
+                    if (T === 'sellOrders') {
+                        window.pixelsListener("SELL_ORDERS", L); 
+                  }
                     this.dispatchMessage(T, L)
                 } else if (C === V.Protocol.ROOM_DATA_BYTES) {
                     let m = {
