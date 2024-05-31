@@ -16171,8 +16171,7 @@
                 this.version = R,
                 this.baseAPIURL = "".concat(m, "/").concat(R),
                 this.baseCacheUrl = "".concat(m, "/cache"),
-                this.baseColyeusURL = m,
-                    window.API = this
+                this.baseColyeusURL = m
             }
         }
         ;
