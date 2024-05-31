@@ -12794,8 +12794,7 @@
                 this.updatedEntities = new Set,
                 this.updatedPet = !1,
                 this.updatedInventory = !1,
-                this.checkParams(),
-                    window.gamestate = this
+                this.checkParams()
             }
         }
         ;
