@@ -12794,7 +12794,8 @@
                 this.updatedEntities = new Set,
                 this.updatedPet = !1,
                 this.updatedInventory = !1,
-                this.checkParams()
+                this.checkParams(),
+                    window.gamestate = this
             }
         }
         ;
@@ -16170,7 +16171,8 @@
                 this.version = R,
                 this.baseAPIURL = "".concat(m, "/").concat(R),
                 this.baseCacheUrl = "".concat(m, "/cache"),
-                this.baseColyeusURL = m
+                this.baseColyeusURL = m,
+                    window.API = this
             }
         }
         ;
