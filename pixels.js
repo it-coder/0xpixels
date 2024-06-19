@@ -4221,7 +4221,6 @@
                 return this.onMessageHandlers.on(this.getMessageHandlerKey(m), R)
             }
             send(m, R) {
-                console.log('*****:', m, R);
                 let C;
                 let T = [V.Protocol.ROOM_DATA];
                 if ("string" == typeof m ? W.encode.string(T, m) : W.encode.number(T, m),
@@ -11241,9 +11240,15 @@
             },
             aG: function() {
                 return genericGet
+            },
+            ei: function() {
+                return genericLength
             }
         });
         var T = C(41396);
+        function genericLength(m) {
+            return m ? m instanceof Map || m instanceof T.MapSchema ? m.size : "object" == typeof m ? Object.keys(m).length : 0 : 0
+        }
         function genericGet(m, R) {
             if (m) {
                 if (m instanceof Map || m instanceof T.MapSchema)
@@ -13074,7 +13079,7 @@
                 return q
             }
         });
-        let T = parseFloat("8.2")
+        let T = parseFloat("8.22")
           , L = 1676498533e3
           , U = "game-container"
           , B = "players"
@@ -13685,83 +13690,83 @@
                         })
             }
         }
-        function CanUseItem(m, R, C, T) {
-            var B;
-            let $;
+        function CanUseItem(m, R, C, T, B) {
+            var $;
+            let V;
             if ("string" == typeof m) {
                 let R = U.Z.getGameItem(m);
                 if (!R)
                     return !1;
                 m = R
             }
-            let V = null == m ? void 0 : m.useTargets;
-            if (!V)
+            let q = null == m ? void 0 : m.useTargets;
+            if (!q)
                 return !1;
-            let q = null === (B = m.onUse) || void 0 === B ? void 0 : B.types.every(m=>{
-                var L, B, V;
+            let G = null === ($ = m.onUse) || void 0 === $ ? void 0 : $.types.every(m=>{
+                var L, $, q;
                 switch (m) {
                 case "harvest":
-                    if ($ = U.Z.getGameEntity(R),
-                    !T || !(null == $ ? void 0 : null === (L = $.crop) || void 0 === L ? void 0 : L.states))
+                    if (V = U.Z.getGameEntity(R),
+                    !T || !(null == V ? void 0 : null === (L = V.crop) || void 0 === L ? void 0 : L.states))
                         return !1;
                     {
-                        let m = $.crop;
+                        let m = V.crop;
                         if (!m.states[T] || !m.states[T].onHarvest)
                             return !1
                     }
                     break;
                 case "fertilize":
-                    if ($ = U.Z.getGameEntity(R),
-                    !T || !(null == $ ? void 0 : null === (B = $.crop) || void 0 === B ? void 0 : B.states))
+                    if (V = U.Z.getGameEntity(R),
+                    !T || !(null == V ? void 0 : null === ($ = V.crop) || void 0 === $ ? void 0 : $.states))
                         return !1;
                     {
-                        let m = $.crop;
+                        let m = V.crop;
                         if (!m.states[T] || !m.states[T].onGrow || 0 === m.states[T].onGrow.length)
                             return console.log("cannot fertilize ".concat(R)),
                             !1
                     }
                     break;
                 case "removeEntity":
-                    let q = U.Z.getGameEntity(R);
-                    if (q && !(null == q ? void 0 : q.onRemove))
+                    let G = U.Z.getGameEntity(R);
+                    if (G && !(null == G ? void 0 : G.onRemove) || G && B && "storage" === C && B.slots > 0)
                         return !1;
                     break;
                 case "removeObject":
-                    let G = U.Z.getGameObject(R);
-                    if (G && !(null == G ? void 0 : G.onRemove))
+                    let H = U.Z.getGameObject(R);
+                    if (H && !(null == H ? void 0 : H.onRemove))
                         return !1;
                     break;
                 case "move":
                     if ("crop" === C)
                         return !1;
-                    let H = null !== (V = U.Z.getGameEntity(R)) && void 0 !== V ? V : U.Z.getGameObject(R);
-                    if (null == H ? void 0 : H.immovable)
+                    let W = null !== (q = U.Z.getGameEntity(R)) && void 0 !== q ? q : U.Z.getGameObject(R);
+                    if (null == W ? void 0 : W.immovable)
                         return !1
                 }
                 return !0
             }
             );
-            return !!q && (null == V ? void 0 : V.types.some(m=>{
-                var T, B, $, q;
+            return !!G && (null == q ? void 0 : q.types.some(m=>{
+                var T, B, $, V;
                 if ("entities" === m)
-                    return null === (T = V.entities) || void 0 === T ? void 0 : T.includes(R);
+                    return null === (T = q.entities) || void 0 === T ? void 0 : T.includes(R);
                 if ("entityTypes" === m)
-                    return !!C && (null === (B = V.entityTypes) || void 0 === B ? void 0 : B.includes(C));
+                    return !!C && (null === (B = q.entityTypes) || void 0 === B ? void 0 : B.includes(C));
                 if ("entityLabels" === m) {
                     let m = U.Z.getGameEntity(R);
                     if (null == m ? void 0 : m.labels)
-                        return L().isEmpty(L().xor(V.entityLabels, m.labels))
+                        return L().isEmpty(L().xor(q.entityLabels, m.labels))
                 } else if ("ground" === m)
                     return "ground" === C;
                 else if ("pet" === m)
                     return "pet" === R;
                 else if ("objects" === m)
-                    return null === ($ = V.objects) || void 0 === $ ? void 0 : $.includes(R);
+                    return null === ($ = q.objects) || void 0 === $ ? void 0 : $.includes(R);
                 else if ("objectTypes" === m) {
                     let m = U.Z.getGameObject(R);
-                    return null == m ? void 0 : null === (q = m.types) || void 0 === q ? void 0 : q.every(m=>{
+                    return null == m ? void 0 : null === (V = m.types) || void 0 === V ? void 0 : V.every(m=>{
                         var R;
-                        return null === (R = V.objectTypes) || void 0 === R ? void 0 : R.includes(m)
+                        return null === (R = q.objectTypes) || void 0 === R ? void 0 : R.includes(m)
                     }
                     )
                 } else if ("self" === m)
@@ -21190,7 +21195,7 @@
             if (ef && !(null == Y ? void 0 : Y.isOpen)) {
                 let R = null === (B = ef.onUse) || void 0 === B ? void 0 : B.types.includes("move");
                 if (R && (0,
-                ei.ZP)(ef, m.key, m.type || m.entityType, m.cropState)) {
+                ei.ZP)(ef, m.key, m.type || m.entityType, m.cropState, m.storage)) {
                     let R = m.useType || "unknown"
                       , C = "object" === R ? et.Z.getGameObject(m.key) : et.Z.getGameEntity(m.key);
                     if (C && void 0 !== m.entityState) {
