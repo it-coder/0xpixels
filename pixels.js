@@ -11241,11 +11241,26 @@
             aG: function() {
                 return genericGet
             },
+            be: function() {
+                return genericForEach
+            },
             ei: function() {
                 return genericLength
             }
         });
         var T = C(41396);
+        function genericForEach(m, R) {
+            if (m) {
+                if (m instanceof Map || m instanceof T.MapSchema)
+                    return m.forEach(R);
+                if ("object" == typeof m)
+                    return Object.entries(m).forEach(m=>{
+                        let[C,T] = m;
+                        return R(T, C)
+                    }
+                    )
+            }
+        }
         function genericLength(m) {
             return m ? m instanceof Map || m instanceof T.MapSchema ? m.size : "object" == typeof m ? Object.keys(m).length : 0 : 0
         }
@@ -12559,8 +12574,16 @@
                 await Promise.all([eo, en, ei]),
                 this.selfPlayer = await en;
                 let ea = await eo;
-                if (await q.Z.scanGameLibrary(this.room.state.entities),
-                this.selfPlayer) {
+                if (ea || (ea = await new Promise(m=>{
+                    this.room.onStateChange.once(()=>{
+                        let R = this.room.state.players.get(this.room.sessionId);
+                        m(R)
+                    }
+                    )
+                }
+                )),
+                await q.Z.scanGameLibrary(this.room.state.entities),
+                this.selfPlayer && ea) {
                     let m = JSON.parse(JSON.stringify(this.currentPlayer));
                     (null === (ee = m.full.pet) || void 0 === ee ? void 0 : ee.avatar) || delete m.full.pet,
                     this.initPlayers(),
@@ -12581,6 +12604,12 @@
                     $.ZP.emitEventNow($.fb.PLAYER_ENERGY_CHANGE, {
                         energy: JSON.parse(JSON.stringify(this.selfPlayer.energy))
                     })
+                } else {
+                    this.room.leave(!0),
+                    $.ZP.emitEventNow($.fb.SVR_CANNOTCONNECT, {
+                        message: ["playerMissing", "Something went wrong. Please try to join again"]
+                    });
+                    return
                 }
                 return this.handleRoomUpdates(),
                 et && H && ($.ZP.emitEventNow($.Yi.CLIENT_TRIGGER, {
@@ -12779,7 +12808,7 @@
                     })
                 }
                 ),
-                R.currentAvatar.onChange(()=>{
+                R.currentAvatar && R.currentAvatar.onChange(()=>{
                     let m = R.currentAvatar.toJSON();
                     $.ZP.emitEventNow("PLAYER_CURRENTAVATAR_CHANGE", {
                         currentAvatar: m
@@ -13235,6 +13264,7 @@
         L.RELEASE_FROM_CURSOR = "RELEASE_FROM_CURSOR",
         L.PLAYER_CLICKED_NPC = "PLAYER_CLICKED_NPC",
         L.PLAYER_USED_ITEM = "PLAYER_USED_ITEM",
+        L.HIDE_OTHERS = "HIDE_OTHERS",
         (U = q || (q = {})).TRIGGER_EVENT = "TRIGGER_EVENT",
         U.FETCH_MAIL = "FETCH_MAIL",
         U.COLLECT_MAIL_ITEM = "COLLECT_MAIL_ITEM",
@@ -13565,7 +13595,8 @@
           , U = C(70247)
           , B = C(16562)
           , $ = C(34853)
-          , V = C(61036);
+          , V = C(61036)
+          , q = C(57532);
         function HasEnergy(m, R) {
             var C, T, L;
             return R.full.energy.level >= -(null !== (L = null === (T = m.onUse) || void 0 === T ? void 0 : null === (C = T.energy) || void 0 === C ? void 0 : C.value) && void 0 !== L ? L : 0)
@@ -13595,10 +13626,10 @@
             let U = null === (C = m.crop) || void 0 === C ? void 0 : C.states;
             return !U || R.canHarvest ? 0 : -R.ageMinutes + (null !== (L = null === (T = U[R.state]) || void 0 === T ? void 0 : T.minutesRequired) && void 0 !== L ? L : 0)
         }
-        let q = ["placeEntity", "placeObject", "move", "removeEntity", "removeObject"];
+        let G = ["placeEntity", "placeObject", "move", "removeEntity", "removeObject"];
         function willEditMap(m) {
             var R, C;
-            return null == m ? void 0 : null === (C = m.onUse) || void 0 === C ? void 0 : null === (R = C.types) || void 0 === R ? void 0 : R.some(m=>q.includes(m))
+            return null == m ? void 0 : null === (C = m.onUse) || void 0 === C ? void 0 : null === (R = C.types) || void 0 === R ? void 0 : R.some(m=>G.includes(m))
         }
         function willRemove(m) {
             var R, C;
@@ -13690,83 +13721,90 @@
                         })
             }
         }
-        function CanUseItem(m, R, C, T, B) {
-            var $;
-            let V;
+        function CanUseItem(m, R, C, T, $) {
+            var V;
+            let G;
             if ("string" == typeof m) {
                 let R = U.Z.getGameItem(m);
                 if (!R)
                     return !1;
                 m = R
             }
-            let q = null == m ? void 0 : m.useTargets;
-            if (!q)
+            let H = null == m ? void 0 : m.useTargets;
+            if (!H)
                 return !1;
-            let G = null === ($ = m.onUse) || void 0 === $ ? void 0 : $.types.every(m=>{
-                var L, $, q;
+            let W = null === (V = m.onUse) || void 0 === V ? void 0 : V.types.every(m=>{
+                var L, V, H, W;
                 switch (m) {
                 case "harvest":
-                    if (V = U.Z.getGameEntity(R),
-                    !T || !(null == V ? void 0 : null === (L = V.crop) || void 0 === L ? void 0 : L.states))
+                    if (G = U.Z.getGameEntity(R),
+                    !T || !(null == G ? void 0 : null === (L = G.crop) || void 0 === L ? void 0 : L.states))
                         return !1;
                     {
-                        let m = V.crop;
+                        let m = G.crop;
                         if (!m.states[T] || !m.states[T].onHarvest)
                             return !1
                     }
                     break;
                 case "fertilize":
-                    if (V = U.Z.getGameEntity(R),
-                    !T || !(null == V ? void 0 : null === ($ = V.crop) || void 0 === $ ? void 0 : $.states))
+                    if (G = U.Z.getGameEntity(R),
+                    !T || !(null == G ? void 0 : null === (V = G.crop) || void 0 === V ? void 0 : V.states))
                         return !1;
                     {
-                        let m = V.crop;
+                        let m = G.crop;
                         if (!m.states[T] || !m.states[T].onGrow || 0 === m.states[T].onGrow.length)
                             return console.log("cannot fertilize ".concat(R)),
                             !1
                     }
                     break;
                 case "removeEntity":
-                    let G = U.Z.getGameEntity(R);
-                    if (G && !(null == G ? void 0 : G.onRemove) || G && B && "storage" === C && B.slots > 0)
+                    let Z = U.Z.getGameEntity(R);
+                    if (Z && !(null == Z ? void 0 : Z.onRemove))
                         return !1;
+                    if (Z && "storage" === C && $) {
+                        let m = B.l.getInstance()
+                          , R = m.getEntityByUniqueId($);
+                        if ((0,
+                        q.ei)(null == R ? void 0 : null === (H = R.storage) || void 0 === H ? void 0 : H.slots) > 0)
+                            return !1
+                    }
                     break;
                 case "removeObject":
-                    let H = U.Z.getGameObject(R);
-                    if (H && !(null == H ? void 0 : H.onRemove))
+                    let Y = U.Z.getGameObject(R);
+                    if (Y && !(null == Y ? void 0 : Y.onRemove))
                         return !1;
                     break;
                 case "move":
                     if ("crop" === C)
                         return !1;
-                    let W = null !== (q = U.Z.getGameEntity(R)) && void 0 !== q ? q : U.Z.getGameObject(R);
-                    if (null == W ? void 0 : W.immovable)
+                    let K = null !== (W = U.Z.getGameEntity(R)) && void 0 !== W ? W : U.Z.getGameObject(R);
+                    if (null == K ? void 0 : K.immovable)
                         return !1
                 }
                 return !0
             }
             );
-            return !!G && (null == q ? void 0 : q.types.some(m=>{
+            return !!W && (null == H ? void 0 : H.types.some(m=>{
                 var T, B, $, V;
                 if ("entities" === m)
-                    return null === (T = q.entities) || void 0 === T ? void 0 : T.includes(R);
+                    return null === (T = H.entities) || void 0 === T ? void 0 : T.includes(R);
                 if ("entityTypes" === m)
-                    return !!C && (null === (B = q.entityTypes) || void 0 === B ? void 0 : B.includes(C));
+                    return !!C && (null === (B = H.entityTypes) || void 0 === B ? void 0 : B.includes(C));
                 if ("entityLabels" === m) {
                     let m = U.Z.getGameEntity(R);
                     if (null == m ? void 0 : m.labels)
-                        return L().isEmpty(L().xor(q.entityLabels, m.labels))
+                        return L().isEmpty(L().xor(H.entityLabels, m.labels))
                 } else if ("ground" === m)
                     return "ground" === C;
                 else if ("pet" === m)
                     return "pet" === R;
                 else if ("objects" === m)
-                    return null === ($ = q.objects) || void 0 === $ ? void 0 : $.includes(R);
+                    return null === ($ = H.objects) || void 0 === $ ? void 0 : $.includes(R);
                 else if ("objectTypes" === m) {
                     let m = U.Z.getGameObject(R);
                     return null == m ? void 0 : null === (V = m.types) || void 0 === V ? void 0 : V.every(m=>{
                         var R;
-                        return null === (R = q.objectTypes) || void 0 === R ? void 0 : R.includes(m)
+                        return null === (R = H.objectTypes) || void 0 === R ? void 0 : R.includes(m)
                     }
                     )
                 } else if ("self" === m)
@@ -21195,7 +21233,7 @@
             if (ef && !(null == Y ? void 0 : Y.isOpen)) {
                 let R = null === (B = ef.onUse) || void 0 === B ? void 0 : B.types.includes("move");
                 if (R && (0,
-                ei.ZP)(ef, m.key, m.type || m.entityType, m.cropState, m.storage)) {
+                ei.ZP)(ef, m.key, m.type || m.entityType, m.cropState, m.mid)) {
                     let R = m.useType || "unknown"
                       , C = "object" === R ? et.Z.getGameObject(m.key) : et.Z.getGameEntity(m.key);
                     if (C && void 0 !== m.entityState) {
