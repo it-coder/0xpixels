@@ -13020,7 +13020,8 @@
                 this.updatedInventory = !1,
                 this.updatedWardrobe = !1,
                 this.checkParams(),
-                    window.gamestate = this
+                    window.gamestate = this,
+                    console.log('20240814')
             }
         }
         k.unwantedFarmNumbers = [0],
